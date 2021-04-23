@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Document</title>
+</head>
+<body>
+    <script src="/js/three.min.js"></script>
+    <script src="/js/OrbitControls.js"></script>
+    <script src="/js/DragControls.js"></script>
+    <script src="/js/GLTFLoader.js"></script>
+    
+    <script>
+        // Tentar utilizar arquivos no formato GLB ao invés de GLTF. Aparentemente o resultado é melhor
+        // Aprender a posiiconar melhor a camera de acordo com os objetos
+        // Aprender a usar melhor a luz --> threejs documentation Directional Light (Target light)
+        // Utilizar ROTATE ao inves de ROTATIO, passar valor em radianos
+        var vlx, vly, vlz , i= 0;
+        var roll = 0;
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000f00);
+        //Creating camera
+        const camera = new THREE.PerspectiveCamera( 25, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        //Creating Light
+        var light = new THREE.DirectionalLight(0xffffff, 6);
+        light.position.set(0,20,10);
+        
+        //Creating the renderer and appending it to the body of the html
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        document.body.appendChild( renderer.domElement );
+        //Adding plane
+        var geo = new THREE.PlaneBufferGeometry(2000, 2000, 8, 8);
+        var mat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true,opacity: 0 });
+        var plane = new THREE.Mesh(geo, mat);
+        plane.rotateX( - Math.PI / 2);
+        scene.add(plane);
+
+        //controls2 = new THREE.OrbitControls(camera, renderer.domElement);
+        group = new THREE.Object3D();
+        /*
+        var cube1 = new THREE.Mesh(new THREE.BoxGeometry(),new THREE.MeshBasicMaterial({
+            color: 0xffff,
+            transparent: false,
+            opacity: 1
+        }));
+        */
+        const loader = new THREE.GLTFLoader();
+        loader.load('./scene.gltf', function (gltf){
+                group.add(gltf.scene);
+            },
+            function (xhr) {
+                console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+            },
+            function (error){
+                console.log('An error happened');
+            }
+            );
+
+        camera.position.z = 10;
+        var cube2 = new THREE.Mesh(
+        new THREE.BoxGeometry(2,2,2),
+        new THREE.MeshBasicMaterial({
+            color: 0x00ff00,
+            transparent: true,
+            opacity: 0.0
+        }));
+        group.add(cube2);
+        scene.add(group);
+        scene.add(light);
+
+        const controls = new THREE.DragControls( [scene.children[1]], camera, renderer.domElement );
+        controls.transformGroup = true;
+        
+
+        controls.addEventListener( 'dragstart', function ( event ) {
+            //roll = false;
+            roll = 0;
+
+        } );
+        controls.addEventListener( 'dragend', function ( event ) {
+            //roll = true;
+            roll=1;
+            vlx = Math.random()*6.28318531;
+            vly = Math.random()*6.28318531;
+            vlz = Math.random()*6.28318531;
+        } );
+
+        /*const rot = () =>{
+            if(roll==0){
+                scene.children[1].rotation.x += 0.003;
+                scene.children[1].rotation.y += 0.003;
+                scene.children[1].rotation.z += 0.003;
+            }
+            if(roll==1){
+                scene.children[1].rotation.x+= vlx/18;
+                scene.children[1].rotation.y+= vly/18;
+                scene.children[1].rotation.z+= vlz/18;
+                setTimeout(rollStop, 5000);
+            }
+            if(roll==3){
+
+                scene.children[1].rotation.x+= 0;
+                scene.children[1].rotation.y+= 0;
+                scene.children[1].rotation.z+= 0;
+            }
+            
+        }*/
+        const animate = function () {
+            requestAnimationFrame( animate );
+            //rot();
+            if(roll==0){
+                scene.children[1].rotation.x += 0.003;
+                scene.children[1].rotation.y += 0.003;
+                scene.children[1].rotation.z += 0.003;
+            }
+            if(roll==1){
+                vlx -= 0.01;
+                vly -= 0.01;
+                vlz -= 0.01;
+                scene.children[1].rotation.x+= vlx/30;
+                scene.children[1].rotation.y+= vly/30;
+                scene.children[1].rotation.z+= vlz/30;
+                if(vlx < 0 && vly < 0 && vlz <0){
+                    roll=3;
+                }
+            }
+            if(roll==3){
+
+                scene.children[1].rotation.x+= 0;
+                scene.children[1].rotation.y+= 0;
+                scene.children[1].rotation.z+= 0;
+            }
+            renderer.render( scene, camera );
+            //controls2.update();
+        };
+        animate();
+    </script>
+</body>
+</html>
