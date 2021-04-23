@@ -8,10 +8,10 @@
     <title>Document</title>
 </head>
 <body>
-    <script src="/js/three.min.js"></script>
-    <script src="/js/OrbitControls.js"></script>
-    <script src="/js/DragControls.js"></script>
-    <script src="/js/GLTFLoader.js"></script>
+    <script src="three.min.js"></script>
+    <script src="OrbitControls.js"></script>
+    <script src="DragControls.js"></script>
+    <script src="GLTFLoader.js"></script>
     
     <script>
         // Tentar utilizar arquivos no formato GLB ao invés de GLTF. Aparentemente o resultado é melhor
@@ -49,7 +49,7 @@
         }));
         */
         const loader = new THREE.GLTFLoader();
-        loader.load('./scene.gltf', function (gltf){
+        loader.load('scene.gltf', function (gltf){
                 group.add(gltf.scene);
             },
             function (xhr) {
